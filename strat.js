@@ -5,8 +5,8 @@ var loop;
 var W = 1200, H = 600;
 var EDGE_RESTRICT = 60;
 
-var numPlayers = 2;
-var numBasePerPlayer = 2;
+var numPlayers = 1;
+var numBasePerPlayer = 1;
 var startUnits = 10;
 var playerColors = [ "blue", "red", 'green', 'orange' ];
 var maxUnitsPerBase = 50;
@@ -16,7 +16,6 @@ var maxUnitsPerBase = 50;
 var players = [];
 //base scores (or units, whatever)
 var baseUnits = [];
-
 
 function base(units, maxUnits, x, y, color) {
     this.units = units;
@@ -45,16 +44,22 @@ function player(numBases, color) {
     this.numBases = numBases;
     this.color = color;
     this.bases = [numBases];
-    for (int i = 0; i < numBases; i++) {
+    this.score = 0;
+    for (var i = 0; i < numBases; i++) {
         var randX = Math.floor(Math.random() * (W - EDGE_RESTRICT * 2));
         var randY = Math.floor(Math.random() * (H - EDGE_RESTRICT * 2));
         var baseX = randX + EDGE_RESTRICT;
         var baseY = randY + EDGE_RESTRICT;
-        this.bases = new base(startUnits, maxUnitsPerBase, baseX, baseY, this.color);
+        this.bases[i] = new base(startUnits, maxUnitsPerBase, baseX, baseY, this.color);
     }
-    this.score = 0;
+    //setupBases(this.bases);
 }
 
+function setupBases(bases) {
+    //for each (bases) {
+    //    this.bases = new base(10, 10, 10, 10,this.color);
+    //}
+}
 
 function drawCircle(x, y, inColor, outColor) {
     context.fillStyle = inColor;
@@ -68,6 +73,8 @@ function drawCircle(x, y, inColor, outColor) {
 }
 
 function setupPlayerBases() {
+    console.log('setupPlayerBases');
+
     for (var i = 0; i < numPlayers; i++) {
         players[i] = new player(numBasePerPlayer, playerColors[i]);
     }
@@ -79,7 +86,7 @@ function setupPlayerBases() {
             var baseX = randX + EDGE_RESTRICT;
             var baseY = randY + EDGE_RESTRICT;
             //players[i].bases[j] = new base(startUnits, maxUnitsPerBase, baseX, baseY, playerColors[i]);
-            var tBase = playerBases[i][j];
+            var tBase = players[i].bases[j];
             drawCircle(tBase.x, tBase.y, tBase.color, tBase.color);
             
             context.font = '12pt Helvetica';
@@ -90,8 +97,10 @@ function setupPlayerBases() {
 
 function drawBases() {
     for (var i = 0; i < numPlayers; i++) {
-        for (var j = 0; j < playerBases[i].length; j++) {
+        console.log(players[i].bases.length);
+        for (var j = 0; j < players[i].length; j++) {
             var tBase = players[i].bases[j];
+            console.log('tbasex: ' + tBase.x);
             drawCircle(tBase.x, tBase.y, tBase.color, tBase.color);
             
             context.font = '12pt Helvetica';
@@ -114,7 +123,7 @@ function game() {
 
 function gameLoop() {
     for (var i = 0; i < numPlayers; i++) {
-        for (var j = 0; j < playerBases[i].length; j++) {
+        for (var j = 0; j < players[i].length; j++) {
             var tBase = players[i].bases[j];
             if (tBase.units < tBase.maxUnits) {
                 tBase.units++;
@@ -128,7 +137,7 @@ function gameLoop() {
 canvas.addEventListener('mousedown', function (e) {
     // react to mouse down
     for (var i = 0; i < numPlayers; i++) {
-        for (var j = 0; j < playerBases[i].length; j++) {
+        for (var j = 0; j < players[i].length; j++) {
             var tBase = players[i].bases[j];
             if (tBase.units >= 10) {
                 tBase.units -= 5;
