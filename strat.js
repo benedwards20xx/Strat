@@ -88,8 +88,8 @@ function drawBases() {
 }
 
 function exampleLevel() {
-    players[0] = new player(2, playerColors[0], 1, 0);
-    players[1] = new player(2, playerColors[1], 0.5, 0);
+    players[0] = new player(2, playerColors[0], 2, 0);
+    players[1] = new player(2, playerColors[1], 1, 0);
 }
 
 function game() {
@@ -108,12 +108,19 @@ function game() {
 function gameLoop() {
     for (var i = 0; i < players.length; i++) {
         for (var j = 0; j < players[i].bases.length; j++) {
-            var tBase = players[i].bases[j];
-            if (tBase.units < tBase.maxUnits) {
-                tBase.units++;
+            var tBases = players[i].bases;
+            var tBase = tBases[j];
+            if (tBase.units <= 0) {
+                tBases.splice(tBases.indexOf(tBase));
+            }
+            else if (tBase.units < tBase.maxUnits) {
+                tBase.units += players[i].unitRate;
             } 
         }
     }
+}
+
+function drawLoop() {
     context.clearRect(0, 0, W, H);
     drawBases();
 }
@@ -127,7 +134,8 @@ function windowToCanvas(canvas, x, y) {
 
 canvas.addEventListener('mousedown', function (e) {
     // react to mouse down
-    for (var i = 0; i < players.length; i++) {
+    //for (var i = 0; i < players.length; i++) {
+        var i = 0;
         if (!drag) {
             for (var j = 0; j < players[i].bases.length; j++) {
                 var tBase = players[i].bases[j];
@@ -148,7 +156,7 @@ canvas.addEventListener('mousedown', function (e) {
                 }
             }
         }
-    }
+    //}
 });
 
 canvas.addEventListener('mouseup', function (e) {
@@ -166,10 +174,11 @@ canvas.addEventListener('mouseup', function (e) {
                     var numUnitsSent = mouseBase.units / 2;
                     mouseBase.units -= Math.round(numUnitsSent);
                     tBase.units -= Math.round(numUnitsSent);
-                } else {
-                    var numUnitsSent = 2;
-                    tBase.units -= Math.round(numUnitsSent);
-                }
+                } 
+                //else {
+                    //var numUnitsSent = 2;
+                    //tBase.units -= Math.round(numUnitsSent);
+                //}
             }
         }
     }
@@ -185,4 +194,5 @@ canvas.addEventListener('mousemove', function (event) {
 });
 
 game();
-loop = setInterval(gameLoop, 1000);
+setInterval(gameLoop, 2000);
+setInterval(drawLoop, 1000);
